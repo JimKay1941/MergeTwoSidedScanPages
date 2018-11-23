@@ -48,7 +48,7 @@
             this.side1Path.Size = new System.Drawing.Size(129, 13);
             this.side1Path.TabIndex = 0;
             this.side1Path.Text = "Choose Side-1 input path:";
-            this.side1Path.Click += new System.EventHandler(this.side1Path_Click);
+            this.side1Path.Click += new System.EventHandler(this.Side1Path_Click);
             // 
             // side2Path
             // 
@@ -58,7 +58,7 @@
             this.side2Path.Size = new System.Drawing.Size(129, 13);
             this.side2Path.TabIndex = 1;
             this.side2Path.Text = "Choose Side-2 input path:";
-            this.side2Path.Click += new System.EventHandler(this.side2Path_Click);
+            this.side2Path.Click += new System.EventHandler(this.Side2Path_Click);
             // 
             // outputPath
             // 
@@ -68,7 +68,7 @@
             this.outputPath.Size = new System.Drawing.Size(105, 13);
             this.outputPath.TabIndex = 2;
             this.outputPath.Text = "Choose Output path:";
-            this.outputPath.Click += new System.EventHandler(this.outputPath_Click);
+            this.outputPath.Click += new System.EventHandler(this.OutputPath_Click);
             // 
             // textSide1
             // 
@@ -112,7 +112,7 @@
             this.btnInterleave.TabIndex = 7;
             this.btnInterleave.Text = "Interleave";
             this.btnInterleave.UseVisualStyleBackColor = true;
-            this.btnInterleave.Click += new System.EventHandler(this.btnInterleave_Click);
+            this.btnInterleave.Click += new System.EventHandler(this.BtnInterleave_Click);
             // 
             // btnExit
             // 
@@ -122,7 +122,7 @@
             this.btnExit.TabIndex = 9;
             this.btnExit.Text = "Exit";
             this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
             // 
             // label1
             // 

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// This program depends on the Windows 10 (and later?) builtin "Windows Fax and Scan" program which creates files with these names:
+// Image (n).jpg
+// The length of n varies with the value AND the very first image has NO Number
+// This program assumes the user will update the name of the first page image to insert "(1)" because the Windows program starts with the second image.
+
+using System;using System.IO;
 using System.Windows.Forms;
 
 namespace MergeTwoSidedScanPages
@@ -18,35 +14,40 @@ namespace MergeTwoSidedScanPages
         private readonly FolderBrowserDialog _chooseSide2FolderDialog = new FolderBrowserDialog();
         private readonly FolderBrowserDialog _chooseOutputFolderDialog = new FolderBrowserDialog();
 
+        // The output files will be named "PageNNN.jpg" and the number of digits (Ns) can be set in the source code.
+        //  This setting MUST be sufficient for the total number of output pages or name collisions will occur.
+        //  The first collision will halt the program.
+        private const int FileNameDigits = 3;
+
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void side1Path_Click(object sender, EventArgs e)
+        private void Side1Path_Click(object sender, EventArgs e)
         {
             _chooseSide1FolderDialog.ShowDialog();
             textSide1.Text = _chooseSide1FolderDialog.SelectedPath;
         }
 
-        private void side2Path_Click(object sender, EventArgs e)
+        private void Side2Path_Click(object sender, EventArgs e)
         {
             _chooseSide2FolderDialog.ShowDialog();
             textSide2.Text = _chooseSide2FolderDialog.SelectedPath;
         }
 
-        private void outputPath_Click(object sender, EventArgs e)
+        private void OutputPath_Click(object sender, EventArgs e)
         {
             _chooseOutputFolderDialog.ShowDialog();
             textOutput.Text = _chooseOutputFolderDialog.SelectedPath;
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
+        private void BtnExit_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
-        private void btnInterleave_Click(object sender, EventArgs e)
+        private void BtnInterleave_Click(object sender, EventArgs e)
         {
             if (textSide1.Text == "")
             {
@@ -66,22 +67,23 @@ namespace MergeTwoSidedScanPages
                 return;
             }
 
-            CopyMoveDirectory(new DirectoryInfo(textSide1.Text), (new DirectoryInfo(textSide2.Text)), textOutput.Text);
+            CopyMoveDirectory(new DirectoryInfo(textSide1.Text), (new DirectoryInfo(textSide2.Text)), textOutput.Text, FileNameDigits);
         }
 
         /// <summary>
-        ///     Recursive procedure to copy or move folder to another volume
+        ///     Procedure to copy or move folder to another volume
         /// </summary>
-        /// <param name="d">DirectoryInfo structure of origin</param>
-        /// <param name="destination">Destiny path, including folder</param>
-        private void CopyMoveDirectory(DirectoryInfo side1, DirectoryInfo side2, string destination)
+        /// <param name="side1">DirectoryInfo structure of origin which should contain the side 1 (odd numbered pages) of scanned documents</param>
+        /// <param name="side2">DirectoryInfo structure of origin which should contain the side 2 (even numbered pages) of scanned documents</param>
+        /// <param name="destination">Destination path, including folder</param>
+        /// <param name="fileDigits">this number, set in the calling routine, defines the number of digits in the output name form PageNNN.jpg the number of Ns</param>
+        private void CopyMoveDirectory(DirectoryInfo side1, DirectoryInfo side2, string destination, int fileDigits)
         {
-            var nameHold = "";
-
-            // Get files.
+            // Get files lists.
             var filesS1 = side1.GetFiles();
             var filesS2 = side2.GetFiles();
 
+            // Get file counts
             int fileNumberS1 = filesS1.Length;
             int fileNumberS2 = filesS2.Length;
 
@@ -93,75 +95,41 @@ namespace MergeTwoSidedScanPages
 
             try
             {
-                int inFileNumber = 0;
-                int outFileNumber = 1;
-                string strFileNumber1;
-                string strFileNumber2;
-                string outputFileName1 = "";
-                string outputFileName2 = "";
-
                 for (int i = 0; i < filesS1.Length; i++)
                 {
-                    strFileNumber1 = outFileNumber.ToString();
-                    strFileNumber2 = (outFileNumber + 1).ToString();
+                    char[] delimiter = { '(', ')' };
 
-                    if (strFileNumber1.Length == 1)
-                    {
-                        outputFileName1 = "Page00" + strFileNumber1.Substring(strFileNumber1.Length - 1, 1) + ".jpg";
-                    }
+                    // Algorithm for output page numbers:
+                    //  Side1 = (input * 2) - 1 (yields: 1, 3, 5, etc
+                    //  Side2 = input * 2       (yields: 2, 4, 6, etc
+                    String inputName = filesS1[i].ToString();
+                    String[] substrings = inputName.Split(delimiter);
+                    int inputValueSide1 = Convert.ToInt32(substrings[1]);
+                    inputValueSide1 = (2 * inputValueSide1) - 1;
+                    String working = "000000" + inputValueSide1.ToString();
+                    String finalS1 = working.Substring(working.Length - fileDigits, fileDigits);
+                    var outputFileName1 = "Page" + finalS1 + ".jpg";
 
-                    else if (strFileNumber1.Length == 2)
-                    {
-                        outputFileName1 = "Page0" + strFileNumber1.Substring(strFileNumber1.Length - 2, 2) + ".jpg";
-                    }
+                    inputName = filesS2[i].ToString();
+                    substrings = inputName.Split(delimiter);
+                    int inputValueSide2 = Convert.ToInt32(substrings[1]);
+                    inputValueSide2 = 2 * inputValueSide2;
+                    working = "000000" + inputValueSide2.ToString();
+                    String finalS2 = working.Substring(working.Length - fileDigits, fileDigits);
+                    var outputFileName2 = "Page" + finalS2 + ".jpg";
 
-                    else if (strFileNumber1.Length == 3)
-                    {
-                        outputFileName1 = "Page" + strFileNumber1.Substring(strFileNumber1.Length - 3, 3) + ".jpg";
-                    }
-
-                    else
-                    {
-                        textStatus.Text = @"Output file numbering File1 has an overflow! " + strFileNumber1;
-                        return;
-                    }
-
-                    if (strFileNumber2.Length == 1)
-                    {
-                        outputFileName2 = "Page00" + strFileNumber2.Substring(strFileNumber2.Length - 1, 1) + ".jpg";
-                    }
-
-                    else if (strFileNumber2.Length == 2)
-                    {
-                        outputFileName2 = "Page0" + strFileNumber2.Substring(strFileNumber2.Length - 2, 2) + ".jpg";
-                    }
-
-                    else if (strFileNumber2.Length == 3)
-                    {
-                        outputFileName2 = "Page" + strFileNumber2.Substring(strFileNumber2.Length - 3, 3) + ".jpg";
-                    }
-
-                    else
-                    {
-                        textStatus.Text = @"Output file numbering File2 has an overflow! " + strFileNumber2;
-                        return;
-                    }
 
                     // Just in case we make no changes
                     var finalOutput1 = destination + "\\" + outputFileName1;
                     var finalOutput2 = destination + "\\" + outputFileName2;
 
-                    filesS1[inFileNumber].CopyTo(finalOutput1);
-                    filesS2[inFileNumber].CopyTo(finalOutput2);
-
-                    inFileNumber += 1;
-                    outFileNumber += 2;
+                    filesS1[i].CopyTo(finalOutput1);
+                    filesS2[i].CopyTo(finalOutput2);
                 }
             }
             catch (PathTooLongException e)
             {
                 textStatus.Text = e.Message;
-                return;
             }
         }
     }
