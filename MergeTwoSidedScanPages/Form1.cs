@@ -67,7 +67,7 @@ namespace MergeTwoSidedScanPages
                 return;
             }
 
-            CopyMoveDirectory(new DirectoryInfo(textSide1.Text), (new DirectoryInfo(textSide2.Text)), textOutput.Text, FileNameDigits);
+            CopyMoveDirectory(new DirectoryInfo(textSide1.Text), new DirectoryInfo(textSide2.Text), textOutput.Text, FileNameDigits);
         }
 
         /// <summary>
@@ -84,8 +84,8 @@ namespace MergeTwoSidedScanPages
             var filesS2 = side2.GetFiles();
 
             // Get file counts
-            int fileNumberS1 = filesS1.Length;
-            int fileNumberS2 = filesS2.Length;
+            var fileNumberS1 = filesS1.Length;
+            var fileNumberS2 = filesS2.Length;
 
             if (fileNumberS1 != fileNumberS2)
             {
@@ -95,27 +95,27 @@ namespace MergeTwoSidedScanPages
 
             try
             {
-                for (int i = 0; i < filesS1.Length; i++)
+                for (var i = 0; i < filesS1.Length; i++)
                 {
                     char[] delimiter = { '(', ')' };
 
                     // Algorithm for output page numbers:
                     //  Side1 = (input * 2) - 1 (yields: 1, 3, 5, etc
                     //  Side2 = input * 2       (yields: 2, 4, 6, etc
-                    String inputName = filesS1[i].ToString();
-                    String[] substrings = inputName.Split(delimiter);
-                    int inputValueSide1 = Convert.ToInt32(substrings[1]);
-                    inputValueSide1 = (2 * inputValueSide1) - 1;
-                    String working = "000000" + inputValueSide1.ToString();
-                    String finalS1 = working.Substring(working.Length - fileDigits, fileDigits);
+                    var inputName = filesS1[i].ToString();
+                    var substrings = inputName.Split(delimiter);
+                    var inputValueSide1 = Convert.ToInt32(substrings[1]);
+                    inputValueSide1 = 2 * inputValueSide1 - 1;
+                    var working = "000000" + inputValueSide1;
+                    var finalS1 = working.Substring(working.Length - fileDigits, fileDigits);
                     var outputFileName1 = "Page" + finalS1 + ".jpg";
 
                     inputName = filesS2[i].ToString();
                     substrings = inputName.Split(delimiter);
-                    int inputValueSide2 = Convert.ToInt32(substrings[1]);
+                    var inputValueSide2 = Convert.ToInt32(substrings[1]);
                     inputValueSide2 = 2 * inputValueSide2;
-                    working = "000000" + inputValueSide2.ToString();
-                    String finalS2 = working.Substring(working.Length - fileDigits, fileDigits);
+                    working = "000000" + inputValueSide2;
+                    var finalS2 = working.Substring(working.Length - fileDigits, fileDigits);
                     var outputFileName2 = "Page" + finalS2 + ".jpg";
 
 
