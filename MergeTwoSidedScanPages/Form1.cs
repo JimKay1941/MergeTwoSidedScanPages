@@ -17,7 +17,7 @@ namespace MergeTwoSidedScanPages
         // The output files will be named "PageNNN.jpg" and the number of digits (Ns) can be set in the source code.
         //  This setting MUST be sufficient for the total number of output pages or name collisions will occur.
         //  The first collision will halt the program.
-        private const int FileNameDigits = 3;
+        private int FileNameDigits = 3;
 
         public Form1()
         {
@@ -49,16 +49,26 @@ namespace MergeTwoSidedScanPages
 
         private void BtnInterleave_Click(object sender, EventArgs e)
         {
+            FileNameDigits = Convert.ToInt32(txtNumDigits.Text);
+            if (FileNameDigits.ToString() != txtNumDigits.Text.ToString())
+            {
+                textStatus.Text = @"Requested number of digits is invalid!";
+                return;
+            }
+
             if (textSide1.Text == "")
             {
                 textStatus.Text = @"Side1 Path is missing!";
                 return;
             }
 
-            if (textSide2.Text == "")
+            if (checkTwoSided.Checked)
             {
-                textStatus.Text = @"Side2 Path is missing!";
-                return;
+                if (textSide2.Text == "")
+                {
+                    textStatus.Text = @"Side2 Path is missing!";
+                    return;
+                } 
             }
 
             if (textOutput.Text == "")
@@ -81,16 +91,28 @@ namespace MergeTwoSidedScanPages
         {
             // Get files lists.
             var filesS1 = side1.GetFiles();
-            var filesS2 = side2.GetFiles();
+
+            FileInfo[] filesS2 = null;
+            if (checkTwoSided.Checked)
+            {
+                filesS2 = side2.GetFiles(); 
+            }
 
             // Get file counts
             var fileNumberS1 = filesS1.Length;
-            var fileNumberS2 = filesS2.Length;
 
-            if (fileNumberS1 != fileNumberS2)
+
+            if (checkTwoSided.Checked)
             {
-                textStatus.Text = @"The Side1 and Side2 directories MUST have the same number of files! Aborting!";
-                return;
+                var fileNumberS2 = filesS2.Length;
+
+
+                if (fileNumberS1 != fileNumberS2)
+                {
+                    textStatus.Text = @"The Side1 and Side2 directories MUST have the same number of files! Aborting!";
+                    return;
+                }
+
             }
 
             try
@@ -105,26 +127,44 @@ namespace MergeTwoSidedScanPages
                     var inputName = filesS1[i].ToString();
                     var substrings = inputName.Split(delimiter);
                     var inputValueSide1 = Convert.ToInt32(substrings[1]);
-                    inputValueSide1 = 2 * inputValueSide1 - 1;
+                    if (checkTwoSided.Checked)
+                    {
+                        inputValueSide1 = 2 * inputValueSide1 - 1; 
+                    }
+
                     var working = "000000" + inputValueSide1;
                     var finalS1 = working.Substring(working.Length - fileDigits, fileDigits);
                     var outputFileName1 = "Page" + finalS1 + ".jpg";
 
-                    inputName = filesS2[i].ToString();
-                    substrings = inputName.Split(delimiter);
-                    var inputValueSide2 = Convert.ToInt32(substrings[1]);
-                    inputValueSide2 = 2 * inputValueSide2;
-                    working = "000000" + inputValueSide2;
-                    var finalS2 = working.Substring(working.Length - fileDigits, fileDigits);
-                    var outputFileName2 = "Page" + finalS2 + ".jpg";
+                    string outputFileName2 = "";
+                    if (checkTwoSided.Checked)
+                    {
+                        inputName = filesS2[i].ToString();
+                        substrings = inputName.Split(delimiter);
+                        var inputValueSide2 = Convert.ToInt32(substrings[1]);
+                        inputValueSide2 = 2 * inputValueSide2;
+                        working = "000000" + inputValueSide2;
+                        var finalS2 = working.Substring(working.Length - fileDigits, fileDigits);
+                        outputFileName2 = "Page" + finalS2 + ".jpg"; 
+                    }
 
 
                     // Just in case we make no changes
                     var finalOutput1 = destination + "\\" + outputFileName1;
-                    var finalOutput2 = destination + "\\" + outputFileName2;
+
+                    string finalOutput2 = "";
+                    if (checkTwoSided.Checked)
+                    {
+                        finalOutput2 = destination + "\\" + outputFileName2; 
+                    }
 
                     filesS1[i].CopyTo(finalOutput1);
-                    filesS2[i].CopyTo(finalOutput2);
+
+
+                    if (checkTwoSided.Checked)
+                    {
+                        filesS2[i].CopyTo(finalOutput2); 
+                    }
                 }
             }
             catch (PathTooLongException e)

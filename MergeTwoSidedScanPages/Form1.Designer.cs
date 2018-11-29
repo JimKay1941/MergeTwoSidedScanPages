@@ -38,6 +38,10 @@
             this.btnInterleave = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.checkTwoSided = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtNumDigits = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // side1Path
@@ -133,11 +137,53 @@
             this.label1.TabIndex = 10;
             this.label1.Text = "Status:";
             // 
+            // checkTwoSided
+            // 
+            this.checkTwoSided.AutoSize = true;
+            this.checkTwoSided.Checked = true;
+            this.checkTwoSided.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkTwoSided.Location = new System.Drawing.Point(630, 173);
+            this.checkTwoSided.Name = "checkTwoSided";
+            this.checkTwoSided.Size = new System.Drawing.Size(105, 17);
+            this.checkTwoSided.TabIndex = 11;
+            this.checkTwoSided.Text = "Check => TRUE";
+            this.checkTwoSided.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(533, 173);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(91, 13);
+            this.label2.TabIndex = 12;
+            this.label2.Text = "Two-sided merge:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(240, 173);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(164, 13);
+            this.label3.TabIndex = 13;
+            this.label3.Text = "How many digits for output name:";
+            // 
+            // txtNumDigits
+            // 
+            this.txtNumDigits.Location = new System.Drawing.Point(410, 170);
+            this.txtNumDigits.Name = "txtNumDigits";
+            this.txtNumDigits.Size = new System.Drawing.Size(65, 20);
+            this.txtNumDigits.TabIndex = 14;
+            this.txtNumDigits.Text = "3";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(903, 450);
+            this.Controls.Add(this.txtNumDigits);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.checkTwoSided);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnInterleave);
@@ -167,6 +213,10 @@
         private System.Windows.Forms.Button btnInterleave;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox checkTwoSided;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtNumDigits;
     }
 }
 
